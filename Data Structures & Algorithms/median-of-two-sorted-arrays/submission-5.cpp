@@ -1,42 +1,27 @@
-class Solution {
+class TimeMap {
 public:
-    double findMedianSortedArrays(vector<int> &nums1, vector<int> &nums2)
-    {
-        if (nums1.size() > nums2.size())
-            return findMedianSortedArrays(nums2, nums1);
-        int n = nums1.size();
-        int m = nums2.size();
-
-        int low = 0, high = n;
-        int left = (n + m + 1) / 2; // total needed
-        while (low <= high)
-        {
-            int mid1 = (low + high) / 2; // picked from nums1
-            int mid2 = left - mid1;      // picked from nums2
-            int l1 = INT_MIN, l2 = INT_MIN;
-            int r1 = INT_MAX, r2 = INT_MAX;
-            if (mid1 - 1 >= 0)
-                l1 = nums1[mid1 - 1];
-            if (mid1 < n)
-                r1 = nums1[mid1];
-            if (mid2 - 1 >= 0)
-                l2 = nums2[mid2 - 1];
-            if (mid2 < m)
-                r2 = nums2[mid2];
-            if (l1 > r2)
-                high = mid1 - 1;
-            else if (l2 > r1)
-                low = mid1 + 1;
-            else
-            {
-                double median;
-                if ((n + m) % 2 == 0)
-                    median = (max(l1, l2) + min(r1, r2)) / 2.0;
-                else
-                    median = max(l1, l2);
-                return median;
-            }
+    unordered_map<string, vector<pair<int, string>>> store;
+    TimeMap() {
+    }
+    
+    void set(string key, string value, int timestamp) {
+        store[key].push_back({timestamp, value});
+    }
+    
+    string get(string key, int timestamp) {
+        const auto& curr = store[key];
+        auto iter = upper_bound(curr.begin(), curr.end(), timestamp, [](int value, const pair<int, string>& p) {
+            return value < p.first;
+        });
+        
+        int k = -1;
+        if (iter == curr.begin()) {
+            k = -1;
         }
-        return 0;
+        else {
+            --iter;
+            k = iter - curr.begin();
+        }
+        return (k != -1) ? curr[k].second : "";
     }
 };
